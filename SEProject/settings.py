@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     'rest_framework_simplejwt',
-    "auth",
+    "Auth",
     "djoser",
     "corsheaders",
 ]
@@ -116,11 +116,11 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=10),
 }
 
-AUTH_USER_MODEL = 'auth.User'
+AUTH_USER_MODEL = 'Auth.User'
 
 DJOSER = {
     'SERIALIZERS' : {
-    'user_create' : 'auth.serializers.UserCreateSerializer'
+    'user_create' : 'Auth.serializers.UserCreateSerializer'
     }
 }
 
