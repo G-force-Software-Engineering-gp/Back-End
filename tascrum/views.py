@@ -174,6 +174,7 @@ class FindUserView(ModelViewSet):
 
 
 class InviteMemberView(ModelViewSet):
+    allowed_methods = ('POST','HEAD','OPTIONS')
     serializer_class = AddMemberSerializer
     permission_classes = [IsAuthenticated]
 
@@ -183,6 +184,28 @@ class InviteMemberView(ModelViewSet):
     def get_queryset(self):
         member_id = Member.objects.get(user_id = self.request.user.id)
         return MemberBoardRole.objects.filter(member=member_id)
+    
+    @action(detail=True, methods=['post'])
+    def add_member(self, request, pk=None):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            board = self.get_object()  # Get the board
+
+            # Check if the user making the request is the owner of the board
+            owner = MemberBoardRole.objects.filter(member=request.user, board=board, role="owner").first()
+            if owner:
+                member_ids = serializer.validated_data['member']
+
+                # Create MemberBoardRole instances for each member
+                for member_id in member_ids:
+                    member = Member.objects.get(pk=member_id)
+                    MemberBoardRole.objects.create(board=board, member=member)
+
+                return Response("Members successfully added to the board", status=status.HTTP_201_CREATED)
+            else:
+                return Response("You are not the owner of this board.", status=status.HTTP_403_FORBIDDEN)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     
     # def create(self, request, *args, **kwargs):
