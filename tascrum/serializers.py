@@ -347,12 +347,32 @@ class MemberAddSerializer(serializers.ModelSerializer):
         model = Member
         fields = ['id']
 
-class AddMemberSerializer(serializers.ModelSerializer):
-    # member = serializers.ListField(child=serializers.IntegerField())
+# class AddMemberSerializer(serializers.ModelSerializer):
+#     # member = serializers.ListField(child=serializers.IntegerField())
+#     members = serializers.SerializerMethodField()
+#     class Meta:
+#         model = MemberBoardRole
+#         fields = ['board','members']
+    
+#     def get_members(self,obj):
 
-    class Meta:
-        model = MemberBoardRole
-        fields = ['member', 'board']
+class AddMemberSerializer(serializers.Serializer):
+    member = serializers.ListField(child=serializers.IntegerField())
+    board = serializers.IntegerField()
+
+    def create(self, validated_data):
+        board = validated_data['board']
+        members = validated_data['member']
+        owner = Member.objects.get(user_id=self.context['user_id'])
+        board_role = MemberBoardRole.objects.filter(member=owner, board=board).first()
+        
+        if board_role.role == "owner":
+            for member_id in members:
+                MemberBoardRole.objects.create(board=board, member=member_id)
+            return validated_data
+        else:
+            raise serializers.ValidationError("You are not the owner of this board.")
+
 
     # def to_internal_value(self, data):
     #     member_ids = data.get('member', [])
@@ -360,16 +380,16 @@ class AddMemberSerializer(serializers.ModelSerializer):
     #     validated_data['member'] = member_ids
     #     return validated_data
 
-    def create(self, validated_data):
-        owner = Member.objects.get(user_id=self.context['user_id'])
-        board = validated_data.get('board')
-        new_members = validated_data.get('member')
-        board_role = MemberBoardRole.objects.filter(member=owner, board=board).first()
+    # def create(self, validated_data):
+    #     owner = Member.objects.get(user_id=self.context['user_id'])
+    #     board = validated_data.get('board')
+    #     new_members = validated_data.get('member')
+    #     board_role = MemberBoardRole.objects.filter(member=owner, board=board).first()
 
-        if board_role.role == "owner":
-                return MemberBoardRole.objects.create(member=new_members, board=board, role='member')
-        else:
-            raise serializers.ValidationError("You are not the owner of this board.")
+    #     if board_role.role == "owner":
+    #             return MemberBoardRole.objects.create(member=new_members, board=board, role='member')
+    #     else:
+    #         raise serializers.ValidationError("You are not the owner of this board.")
 
 
 
