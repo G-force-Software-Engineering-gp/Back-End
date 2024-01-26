@@ -75,13 +75,13 @@ class WorkspaceMembersView(ModelViewSet):
         return Workspace.objects.filter(id = self.kwargs['workspace_pk'],members = member_id)
 
 ### board view
-class BoardViewSet(ModelViewSet):
+class BoardView(ModelViewSet):
     serializer_class = BoardSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         member_id = Member.objects.get(user_id = self.request.user.id)
-        return Board.objects.filter(members = member_id)
+        return Board.objects.filter(workspace_id = self.kwargs['workspace_pk'] , members = member_id)
     
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -116,14 +116,14 @@ class BoardImageView(ModelViewSet):
     
     def get_queryset(self):
         member_id = Member.objects.get(user_id = self.request.user.id)
-        return Board.objects.filter(members = member_id)
+        return Board.objects.filter(workspace_id = self.kwargs['workspace_pk'],members = member_id)
 
 class CreateBoardView(ModelViewSet):
     serializer_class = CreateBoardSerializer
     permission_classes = [IsAuthenticated]
 
     def get_serializer_context(self):
-        return {'user_id':self.request.user.id}
+        return {'user_id':self.request.user.id , 'workspace_id':self.kwargs['workspace_pk']}
     
     def perform_create(self, serializer):
             board = serializer.save()
@@ -155,16 +155,20 @@ class BoardStarView(ModelViewSet):
         member_id = Member.objects.get(user_id = self.request.user.id)
         return Board.objects.filter(members=member_id, has_star=True)
     
-class BoardStarUpdate(ModelViewSet):
-    serializer_class = CreateBoardStarSerializer
+# class BoardStarUpdate(ModelViewSet):
+#     serializer_class = CreateBoardStarSerializer
 
-    @action(detail=True, methods=['put'])
-    def update_star(self, request, pk=None):
-        board = self.get_object()
-        serializer = self.get_serializer(board, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+#     def get_queryset(self):
+#         member_id = Member.objects.get(user_id = self.request.user.id)
+#         return Board.objects.filter(id = self.kwargs['board_pk'],members=member_id)
+
+    # @action(detail=True, methods=['put'])
+    # def update_star(self, request, pk=None):
+    #     board = self.get_object()
+    #     serializer = self.get_serializer(board, data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     return Response(serializer.data)
     
 # class BoardInvitationLinkView(ModelViewSet):
 #     queryset = Board.objects.all()
@@ -188,15 +192,8 @@ class BoardInvitationLinkView(ModelViewSet):
     queryset = Board.objects.all()
     serializer_class = BoardSerializer
 
-    def get_invitation_link(self, request):
-        # Get the board ID from the request.
-        board_id = request.GET.get('board_id')
-
-        # Get the invitation link for the board.
-        invitation_link = Board.objects.get(id=board_id).invitation_link
-
-        # Return the invitation link to the frontend.
-        return HttpResponse(invitation_link)
+    def get_queryset(self):
+        return Board.objects.filter(id=self.kwargs['board_pk'])
         
 ### List view
 class ListView(ModelViewSet):
@@ -213,11 +210,11 @@ class CreateListView(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_serializer_context(self):
-        return {'user_id':self.request.user.id}
+        return {'user_id':self.request.user.id,'board_id' : self.kwargs['board_pk']}
     def get_queryset(self):
         member_id = Member.objects.get(user_id = self.request.user.id)
         board_id = Board.objects.filter(members = member_id)
-        return List.objects.filter(board__in=board_id)
+        return List.objects.filter(board__in = board_id)
 
 
 ### Card View

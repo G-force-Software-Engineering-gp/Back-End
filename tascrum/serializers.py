@@ -151,11 +151,12 @@ class BoardProfileSerializer(serializers.ModelSerializer):
 class CreateBoardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
-        fields = ['id','title','workspace','backgroundimage','invitation_link']
+        fields = ['id','title','backgroundimage','invitation_link']
 
 
     def create(self, validated_data):
         member = Member.objects.get(user_id = self.context['user_id'])
+        validated_data['workspace'] = Workspace.objects.get(id = self.context['workspace_id'])
         board = Board.objects.create(**validated_data)
         MemberBoardRole.objects.create(member=member, board=board, role="Owner")
         return board
@@ -231,9 +232,10 @@ class ListProfileSerializer(serializers.ModelSerializer):
 class CreateListSerializer(serializers.ModelSerializer):
     class Meta:
         model = List
-        fields = ['id','title','board']
+        fields = ['id','title']
     
     def create(self, validated_data):
+        validated_data['board'] = Board.objects.get(id = self.context['board_id'])
         return List.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
