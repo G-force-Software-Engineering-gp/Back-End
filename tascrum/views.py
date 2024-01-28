@@ -94,7 +94,7 @@ class BoardViewSet(ModelViewSet):
     @action(detail=False, methods=['get'], url_path='join/(?P<invitation_link>[^/.]+)', permission_classes=[IsAuthenticated])
     def join(self, request, invitation_link=None):
         board = get_object_or_404(Board, invitation_link=invitation_link)
-        member, created = Member.objects.get_or_create(user_id=request.user.id)
+        member = Member.objects.get_or_create(user_id=request.user.id)
 
         if not board.members.filter(id=member.id).exists():
             board.members.add(member)
