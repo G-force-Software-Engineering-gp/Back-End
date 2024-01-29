@@ -72,7 +72,7 @@ class WorkspaceMembersView(ModelViewSet):
 
     def get_queryset(self):
         member_id = Member.objects.get(user_id = self.request.user.id)
-        return Workspace.objects.filter(id = self.kwargs['workspace_pk'],members = member_id)
+        return Workspace.objects.filter(id = self.kwargs.get('pk'),members = member_id)
 
 ### board view
 class BoardViewSet(ModelViewSet):
