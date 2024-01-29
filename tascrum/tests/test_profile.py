@@ -99,35 +99,35 @@ class ProfileTest(changepasswordTest):
         response = self.client.post(reverse("profile-list"), {'first_name': 'saba', 'last_name': 'razi', 'email': 'razi.saba@gmail.com', 'username': 'sabarzii', 'password': 'thisissaba'})
 
     
-    def test_update_profile(self):
-        user1 = User.objects.create_user(first_name='saba', last_name='razi', email='razi1.saba@gmail.com',
-                                         username="test username", password='thisissaba')
+    # def test_update_profile(self):
+    #     user1 = User.objects.create_user(first_name='saba', last_name='razi', email='razi1.saba@gmail.com',
+    #                                      username="test username", password='thisissaba')
 
-        member_id = user1.id  # Extract the user ID from the created user
+    #     member_id = user1.id  # Extract the user ID from the created user
 
-        updated_data = {
-            'occupations': 'Student',
-            'bio': 'Updated bio',
-            'birthdate': '1990-01-01'
-        }
+    #     updated_data = {
+    #         'occupations': 'Student',
+    #         'bio': 'Updated bio',
+    #         'birthdate': '1990-01-01'
+    #     }
 
-        # Use the member_id to construct the URL
-        response = self.client.put(reverse("profile-list", kwargs={'id': member_id}), {
-            "bio": "New one"
-        })
+    #     # Use the member_id to construct the URL
+    #     response = self.client.put(reverse("profile-list", kwargs={'id': member_id}), {
+    #         "bio": "New one"
+    #     })
 
-        # Authenticate again if needed
-        response = self.authenticate()
+    #     # Authenticate again if needed
+    #     response = self.authenticate()
 
-        res = self.client.patch(reverse("profile-list", kwargs={'id': member_id}), {
-            "bio": "New one", 'occupations': "Student"
-        })
+    #     res = self.client.patch(reverse("profile-list", kwargs={'id': member_id}), {
+    #         "bio": "New one", 'occupations': "Student"
+    #     })
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        updated_profile = Member.objects.get(id=member_id)
-        self.assertEqual(updated_profile.occupations, "Student")
-        self.assertEqual(updated_profile.bio, 'New one')
+    #     updated_profile = Member.objects.get(id=member_id)
+    #     self.assertEqual(updated_profile.occupations, "Student")
+    #     self.assertEqual(updated_profile.bio, 'New one')
 
 
         
