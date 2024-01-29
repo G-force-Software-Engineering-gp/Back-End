@@ -62,7 +62,7 @@ router.register('crlist',views.CreateListView,basename='crlist')
 
 
 ### card details urls
-router.register('card',views.CardView,basename='card')
+# router.register('card',views.CardView,basename='card')
 router.register('card-member',views.CardViewMember,basename='card-member')
 router.register('card-boards',views.BoardCardsViewSet,basename='card-boards')
 router.register('user-labels',views.UserBoardLabelsViewSet,basename='user-labels')
@@ -75,6 +75,11 @@ router.register('crcard-labels',views.LabelCardAssignView,basename='crcard-label
 router.register('card-labels',views.LabelCardView,basename='card-labels')
 router.register('assign',views.CardAssignmentView,basename='assign')
 
+
+
+nestedRouter.register(r'boards', views.BoardViewSet, basename='boards')
+card_router = nested.NestedSimpleRouter(nestedRouter, r'boards', lookup='board')
+card_router.register(r'card', views.CardView, basename='cards')
 
 
 ### drag and drop
@@ -113,6 +118,6 @@ boardview_router.register(r'boardview', views.BoardViewCardView, basename='board
 boardhighlight_router = nested.NestedSimpleRouter(nestedRouter, r'boards', lookup='board')
 boardhighlight_router.register(r'boardhighlight', views.BoardHighlightCardView, basename='boardhighlight')
 
-urlpatterns = router.urls + nestedRouter.urls + dnd_router.urls + calender_router.urls + meeting_router.urls + search_router.urls + filter_board_router.urls + timeline1_router.urls + timeline2_router.urls + boardview_router.urls + boardhighlight_router.urls
+urlpatterns = router.urls + nestedRouter.urls + card_router.urls +dnd_router.urls + calender_router.urls + meeting_router.urls + search_router.urls + filter_board_router.urls + timeline1_router.urls + timeline2_router.urls + boardview_router.urls + boardhighlight_router.urls
 
 

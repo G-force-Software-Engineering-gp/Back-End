@@ -240,9 +240,12 @@ class CardView(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        board_id = self.request.query_params.get('board')
+        # member = Member.objects.get(user_id = self.request.user.id)
+        # return Card.objects.filter(members=member)
+        member = Member.objects.get(user_id = self.request.user.id)
+        board_id = self.kwargs['board_pk']
         list_id = List.objects.filter(board__in = board_id)
-        return Card.objects.filter(list__in=list_id)
+        return Card.objects.filter(list__in = list_id)
     
 class CardViewMember(ModelViewSet):
     serializer_class = CardProfileSerializer
