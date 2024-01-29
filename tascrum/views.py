@@ -252,8 +252,11 @@ class CardViewMember(ModelViewSet):
         user = self.request.user
         queryset = Card.objects.filter(members__user=user)
         label_ids = self.request.query_params.getlist('label_ids')
+
         if label_ids:
-            queryset = queryset.filter(labels__id__in=label_ids).distinct()
+            for label_id in label_ids:
+                queryset = queryset.filter(labels__id=label_id)
+            queryset = queryset.distinct()
 
         return queryset
     
